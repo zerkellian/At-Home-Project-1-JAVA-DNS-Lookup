@@ -51,6 +51,12 @@ public class NetworkInspector{
 				} else{
 					System.out.println("\nReceived status "+status_code + " from server"); //If not a success code, report on the other code it returned
 				}
+			System.out.println("\nTLS Version:");
+			CompletableFuture<Optional<String>> tlsVersion = http_client.sendAsync(a_request, HttpResponse.BodyHandlers.discarding()) //return type CompletableFuture. Also, strip out the response body
+				.thenApply(response -> response.sslSession().map(SSLSession::getProtocol)); // grab the protocl using SSLSession::getProtocol method
+			tlsVersion.thenAccept(opt -> opt.ifPresent(System.out::println)) // Print out the TLS version number
+				.join();
+				
 		} catch (UnknownHostException e){
 		System.out.println("\n That host was unreachable"); //Catch for when the user-specified site wasn't reachable
 		}
