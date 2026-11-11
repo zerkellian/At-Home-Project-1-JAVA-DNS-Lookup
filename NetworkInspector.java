@@ -14,9 +14,13 @@ public class NetworkInspector{
 	}
 
 	public static void main (String[] args)  throws UnknownHostException{
-	NetworkInspector remoteHost = new NetworkInspector(args[0]);
-	System.out.println ("Hostname: "+ remoteHost.hostname+"\n");
-	try{
+		if (args.length == 0){
+			System.out.println("Usage: java NetworkInspector <remotehost name>\n");
+			System.exit(0);
+		}
+		NetworkInspector remoteHost = new NetworkInspector(args[0]);
+		System.out.println ("Hostname: "+ remoteHost.hostname+"\n");
+		try{
 			InetAddress[] inetAddresses = InetAddress.getAllByName(remoteHost.hostname);
 			System.out.println("Resolved Addresses:\n");
 			for (InetAddress address : inetAddresses){
