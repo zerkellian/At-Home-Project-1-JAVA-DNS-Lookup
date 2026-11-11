@@ -31,8 +31,6 @@ public class NetworkInspector{
 		e.printStackTrace();
 		}
 	}
-	
-//Test
 
 
 
