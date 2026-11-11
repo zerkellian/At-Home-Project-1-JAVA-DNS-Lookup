@@ -25,7 +25,7 @@ jobs:
           mkdir -p out
           find . -name "*.java" ! -path "*/.*" > sources.txt
           javac -d out @sources.txt
-		  
+
       - name: Package into runnable JAR
         run: jar --create --file app.jar --main-class NetworkInspector -C out .
 
