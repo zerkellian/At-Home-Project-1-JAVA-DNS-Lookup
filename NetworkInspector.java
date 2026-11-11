@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletableFuture;
 import javax.net.ssl.SSLSession;
 import java.util.Optional;
-
+import java.util.OptionalLong;
 
 public class NetworkInspector{
 
@@ -56,7 +56,14 @@ public class NetworkInspector{
 				.thenApply(response -> response.sslSession().map(SSLSession::getProtocol)); // grab the protocl using SSLSession::getProtocol method
 			tlsVersion.thenAccept(opt -> opt.ifPresent(System.out::println)) // Print out the TLS version number
 				.join();
-				
+			OptionalLong content_length = http_client.sendAsync(a_request, HttpResponse.BodyHandlers.ofString()) //Type OptionalLong for capturing the content length in bytes from the header
+				.thenApply(response -> response.headers().firstValueAsLong("Content-Length")) //Grabbing Content-Length from the header response
+				.join();
+			if (content_length.isPresent()){ //If present, then report on the content size
+				System.out.println("\nResponse Size:\n"+ content_length.getAsLong() +" bytes");
+			} else{
+				System.out.println("\nSize not available"); //Else tell the user the size wasn't available
+			}
 		} catch (UnknownHostException e){
 		System.out.println("\n That host was unreachable"); //Catch for when the user-specified site wasn't reachable
 		}
