@@ -27,7 +27,7 @@ jobs:
           javac -d out @sources.txt
 
       - name: Package into runnable JAR
-        run: jar --create --file app.jar --main-class NetworkInspector -C out .
+        run: jar --create --file NetworkInspector.jar --main-class NetworkInspector -C out .
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
