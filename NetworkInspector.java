@@ -4,47 +4,58 @@
  * @author Ian Lindquist
  */
 import java.net.InetAddress;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.net.UnknownHostException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
+import javax.net.ssl.SSLSession;
+import java.util.Optional;
+
+
 public class NetworkInspector{
 
-	public NetworkInspector(String hostname){
+	public NetworkInspector(String hostname){ //constructor
 		this.hostname = hostname;
 	}
 
-	public static void main (String[] args)  throws UnknownHostException{
-		if (args.length == 0){
+	public static void main (String[] args)  throws UnknownHostException{ //main function throws UnknownHostException in case host can't be reached
+	if (args.length == 0){ // Check for no arguments passed
 			System.out.println("Usage: java NetworkInspector <remotehost name>\n");
 			System.exit(0);
 		}
-		NetworkInspector remoteHost = new NetworkInspector(args[0]);
-		System.out.println ("Hostname: "+ remoteHost.hostname+"\n");
-		try{
-			InetAddress[] inetAddresses = InetAddress.getAllByName(remoteHost.hostname);
-			System.out.println("Resolved Addresses:\n");
+	NetworkInspector remoteHost = new NetworkInspector(args[0]); //Create a new NetworkInspector object
+	System.out.println ("Hostname: "+ remoteHost.hostname+"\n");
+	try{
+			InetAddress[] inetAddresses = InetAddress.getAllByName(remoteHost.hostname); //Use InetAddress.getAllByName to retrieve the IP address list
+			System.out.println("Resolved Addresses:");
 			for (InetAddress address : inetAddresses){
 				System.out.println(address.getHostAddress());
 			}
-			
+			HttpClient http_client = HttpClient.newBuilder() //New HttpClient builder object for making the HTTPS request
+				.followRedirects(HttpClient.Redirect.NORMAL) // Tell it to follow any redirects
+				.build();
+			HttpRequest a_request = HttpRequest.newBuilder() // Build an HTTPS request
+				.uri(URI.create("https://"+ remoteHost.hostname))
+				.build();
+			int status_code = http_client.sendAsync(a_request, HttpResponse.BodyHandlers.ofString()) //Make the request asyncronously and capture the status code
+				.thenApply(HttpResponse::statusCode)
+				.join();
+				if (status_code >= 200 && status_code <= 299){ // Check to see if the status code falls within the success range of 200 and 299. If so, print connection success and the code.
+					System.out.println("\nHTTPS Connection Successful: ");
+					System.out.println("\nStatus Code: ");
+					System.out.println(status_code);
+				} else{
+					System.out.println("\nReceived status "+status_code + " from server"); //If not a success code, report on the other code it returned
+				}
 		} catch (UnknownHostException e){
-		e.printStackTrace();
+		System.out.println("\n That host was unreachable"); //Catch for when the user-specified site wasn't reachable
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
 
 
 
